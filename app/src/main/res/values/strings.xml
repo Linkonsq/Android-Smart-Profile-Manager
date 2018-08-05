@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Profile Manager</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    <string name="accelerometer">Accelerometer</string>
+    <string name="light">Light</string>
+    <string name="proximity">Proximity</string>
+</resources>
