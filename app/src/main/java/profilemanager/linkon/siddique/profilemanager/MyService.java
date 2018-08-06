@@ -61,20 +61,45 @@ public class MyService extends Service implements SensorEventListener {
             axVal = event.values[0];
             ayVal = event.values[1];
             azVal = event.values[2];
-            if (ayVal > 9.0) {
-                medium();
-            }
         }
 
         if (event.sensor.getType()==Sensor.TYPE_PROXIMITY) {
             distance = event.values[0];
-            if (distance==0.0) {
-                silent();
-                //Toast.makeText(this, "okay", Toast.LENGTH_SHORT).show();
-            }
-            else {
-                high();
-            }
+        }
+
+        //Pocket(standing) condition
+        if ((distance == 0 && ayVal > 9) || (distance == 0 && ayVal < -9)) {
+            high();
+        }
+
+        //Pocket(sitting) condition
+        if (distance == 0 && azVal > 8) {
+            silent();
+        }
+
+        //Pocket(sitting) condition
+        if ((distance == 0 && axVal > 5) || (distance == 0 && axVal < -5)) {
+            silent();
+        }
+
+        //table condition(up)
+        if (distance > 0 && azVal > 9 && ayVal < 4) {
+            medium();
+        }
+
+        //table condition(down)
+        if (distance == 0 && azVal < -9) {
+            silent();
+        }
+
+        //while using phone (vertically)
+        if (distance > 0 && ayVal > 4) {
+            silent();
+        }
+
+        //while using phone (horizontally)
+        if ((distance > 0 && axVal > 3) || (distance > 0 && axVal < -3)) {
+            silent();
         }
     }
 
@@ -92,7 +117,7 @@ public class MyService extends Service implements SensorEventListener {
 
     private void silent() {
         currentVolume = myAudioManager.getStreamVolume(AudioManager.STREAM_RING);
-        for (int i = currentVolume; i >= 0; i--) {
+        for (int i = currentVolume; i > 0; i--) {
             myAudioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
         }
     }
@@ -111,16 +136,11 @@ public class MyService extends Service implements SensorEventListener {
                 myAudioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
             }
         }
-
-//        if (currentVolume == mediumVolume) {
-//            myAudioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
-//            myAudioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
-//        }
     }
 
     private void high() {
         currentVolume = myAudioManager.getStreamVolume(AudioManager.STREAM_RING);
-        for (int i = currentVolume; i <= maxVolume; i++) {
+        for (int i = currentVolume; i < maxVolume; i++) {
             myAudioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
         }
     }
